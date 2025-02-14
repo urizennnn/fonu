@@ -8,19 +8,26 @@ import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 import { EntityManager, MikroORM } from '@mikro-orm/mysql';
 import { User } from 'src/infrastructure/database/schemas/user';
 import { MICRO_ORM_TOKEN } from 'src/lib/mikro-config/mikro.module';
+import { AuthUtils } from 'src/shared/utils/utis';
 
 @Injectable()
 export class UserService {
   private readonly em: EntityManager;
+  private readonly utils: AuthUtils;
 
   constructor(@Inject(MICRO_ORM_TOKEN) private readonly db: MikroORM) {
     this.em = this.db.em;
+    this.utils = new AuthUtils();
   }
 
-  async createUser(user: CreateUserDto) {
+  async createUser(userDto: CreateUserDto) {
     try {
-      return await this.em.persistAndFlush(user);
+      userDto.password = await this.utils.generateHash(userDto.password);
+      const user = new User(userDto);
+      const newuser = await this.em.persistAndFlush(user);
+      return newuser;
     } catch (error) {
+      console.log(error);
       throw new InternalServerErrorException('Failed to create user');
     }
   }

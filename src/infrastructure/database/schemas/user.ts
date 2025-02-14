@@ -6,11 +6,12 @@ import {
   Property,
 } from '@mikro-orm/core';
 import { Task } from './task';
+import { v4 as uuid } from 'uuid';
 
 @Entity()
 export class User {
   @PrimaryKey({ type: 'uuid' })
-  id!: string;
+  id: string = uuid();
 
   @Property({ type: 'text' })
   name!: string;
@@ -29,4 +30,8 @@ export class User {
 
   @OneToMany(() => Task, (task) => task.user)
   tasks = new Collection<Task>(this);
+
+  constructor(data: Partial<User>) {
+    Object.assign(this, data);
+  }
 }
