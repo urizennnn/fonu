@@ -111,7 +111,8 @@ This repository contains a NestJS application implementing a simple user and tas
   - **Response:** Returns the created task data. The task is linked to a user (establishing a many-to-one relationship).
 
 - **Get all tasks**
-  - **URL:** `GET /api/task`
+  - **URL:** `GET /api/task?status=active`
+  - **Query Params:** `status` (optional) - Filter tasks by status (active/completed).
   - **Response:** Returns an array of tasks.
 
 - **Update a task status**
