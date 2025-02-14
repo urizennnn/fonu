@@ -4,25 +4,19 @@ import {
   Delete,
   Get,
   Param,
-  Post,
   Put,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/user.dto';
 import { UserService } from './user.service';
+import { NeedsAuth } from 'src/common/decorators';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  @HttpCode(HttpStatus.CREATED)
-  async createUser(@Body() createUserDto: CreateUserDto) {
-    const user = await this.userService.createUser(createUserDto);
-    return { success: true, message: 'User created successfully', data: user };
-  }
-
+  @NeedsAuth()
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async getUser(@Param('id') id: string) {
@@ -30,6 +24,7 @@ export class UserController {
     return { success: true, data: user };
   }
 
+  @NeedsAuth()
   @Put(':id')
   @HttpCode(HttpStatus.OK)
   async updateUser(
@@ -44,6 +39,7 @@ export class UserController {
     };
   }
 
+  @NeedsAuth()
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   async deleteUser(@Param('id') id: string) {

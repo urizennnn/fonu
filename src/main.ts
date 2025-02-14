@@ -2,14 +2,15 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
-import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.use(helmet());
-  app.use(morgan('combined'));
+  const cfg = app.get(ConfigService);
+  app.enableCors({ origin: '*' });
 
   app.use(
     rateLimit({
@@ -24,7 +25,7 @@ async function bootstrap() {
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
   );
 
-  const port = process.env.PORT || 3000;
+  const port = cfg.get<number>('app.port') as number;
   await app.listen(port);
 }
 

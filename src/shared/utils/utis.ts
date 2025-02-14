@@ -11,10 +11,6 @@ export class AuthUtils {
     return compare(password, hash);
   }
 
-  generateJwtToken(payload: any, jwtService: JwtService): string {
-    return jwtService.sign(payload);
-  }
-
   generateResetToken(): string {
     return randomBytes(20).toString('hex');
   }

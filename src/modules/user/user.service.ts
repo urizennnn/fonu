@@ -4,39 +4,31 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
+import { UpdateUserDto } from './dto/user.dto';
 import { EntityManager, MikroORM } from '@mikro-orm/mysql';
 import { User } from 'src/infrastructure/database/schemas/user';
-import { MICRO_ORM_TOKEN } from 'src/lib/mikro-config/mikro.module';
-import { AuthUtils } from 'src/shared/utils/utis';
+import { MIKRO_ORM_TOKEN } from 'src/shared/constants';
+import { AppLogger } from 'src/infrastructure/logger/logger';
 
 @Injectable()
 export class UserService {
   private readonly em: EntityManager;
-  private readonly utils: AuthUtils;
 
-  constructor(@Inject(MICRO_ORM_TOKEN) private readonly db: MikroORM) {
+  constructor(
+    @Inject(MIKRO_ORM_TOKEN) private readonly db: MikroORM,
+    private readonly logger: AppLogger,
+  ) {
     this.em = this.db.em;
-    this.utils = new AuthUtils();
-  }
-
-  async createUser(userDto: CreateUserDto) {
-    try {
-      userDto.password = await this.utils.generateHash(userDto.password);
-      const user = new User(userDto);
-      const newuser = await this.em.persistAndFlush(user);
-      return newuser;
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException('Failed to create user');
-    }
   }
 
   async getUser(id: string) {
     try {
-      return await this.em.find(User, { id });
+      const user = await this.em.find(User, { id });
+      this.logger.info(`Retrieved user(s) with id: ${id}`);
+      return user;
     } catch (error) {
-      throw new InternalServerErrorException('Failed to retrieve users');
+      this.logger.error(`Failed to retrieve user with id: ${id}`, error, {});
+      throw new InternalServerErrorException('Failed to retrieve user');
     }
   }
 
@@ -44,15 +36,17 @@ export class UserService {
     try {
       const user = await this.em.findOne(User, { id });
       if (!user) {
+        this.logger.warn(`User with id ${id} not found`);
         throw new BadRequestException('User not found');
       }
-
       user.name = userParam?.name || user.name;
       user.email = userParam?.email || user.email;
       user.password = userParam?.password || user.password;
-
-      return await this.em.persistAndFlush(user);
+      const updatedUser = await this.em.persistAndFlush(user);
+      this.logger.info(`User with id ${id} updated successfully`);
+      return updatedUser;
     } catch (error) {
+      this.logger.error(`Failed to update user with id ${id}`, error, {});
       if (error instanceof BadRequestException) {
         throw error;
       }
@@ -64,10 +58,14 @@ export class UserService {
     try {
       const user = await this.em.findOne(User, { id });
       if (!user) {
+        this.logger.warn(`User with id ${id} not found`);
         throw new BadRequestException('User not found');
       }
-      return await this.em.removeAndFlush(user);
+      const deletedUser = await this.em.removeAndFlush(user);
+      this.logger.info(`User with id ${id} deleted successfully`);
+      return deletedUser;
     } catch (error) {
+      this.logger.error(`Failed to delete user with id ${id}`, error, {});
       if (error instanceof BadRequestException) {
         throw error;
       }

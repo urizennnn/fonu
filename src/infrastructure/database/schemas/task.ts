@@ -7,6 +7,7 @@ import {
   TextType,
 } from '@mikro-orm/core';
 import { User } from './user';
+import { v4 as uuid } from 'uuid';
 
 export enum TaskStatus {
   active = 'active',
@@ -16,7 +17,7 @@ export enum TaskStatus {
 @Entity()
 export class Task {
   @PrimaryKey({ type: 'uuid' })
-  id!: number;
+  id: string = uuid();
 
   @Property({ type: TextType })
   description!: string;
@@ -32,4 +33,8 @@ export class Task {
 
   @ManyToOne(() => User)
   user!: User;
+
+  constructor(data: Partial<Task>) {
+    Object.assign(this, data);
+  }
 }
