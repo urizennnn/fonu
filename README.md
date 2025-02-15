@@ -148,7 +148,7 @@ This repository contains a NestJS application implementing a simple user and tas
 
 
 ## License
-(MIT)[https://mit-license.org/]
+[MIT](https://mit-license.org/)
 
 
 
