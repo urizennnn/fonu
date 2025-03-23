@@ -8,14 +8,14 @@ export class User {
   id: string = uuid();
 
   @Property({ type: 'string' })
-  fullName!: string;
+  fullName: string;
 
   @Property({ type: 'string', unique: true })
   email!: string;
 
   @Property({ type: 'string' })
-  password!: string;
+  password: string;
 
   @OneToMany(() => Task, (task) => task.user)
-  task: Task[];
+  task?: Task[];
 }
