@@ -10,6 +10,7 @@ import { MySqlDriver } from '@mikro-orm/mysql';
 import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
 import { FonuMiddlewareLogger } from './shared/logger/middleware.logger';
 import { LoggerModule } from './shared/logger/logger.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -18,7 +19,6 @@ import { LoggerModule } from './shared/logger/logger.module';
       envFilePath: [join(process.cwd(), '.env')],
       expandVariables: true,
     }),
-
     MikroOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -35,6 +35,7 @@ import { LoggerModule } from './shared/logger/logger.module';
         debug: configService.get<string>('NODE_ENV') !== 'production',
       }),
     }),
+    JwtModule,
     LoggerModule,
     TaskModule,
     UserModule,

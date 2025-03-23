@@ -38,7 +38,7 @@ const logger = winston.createLogger({
               `${Colors[level]}${msg}\x1b[39m`;
 
             return (
-              `\x1b[35m[Givese]\x1b[39m ${c(process.pid + '  -')} ${timestamp as string}     ` +
+              `\x1b[35m[Fonu]\x1b[39m ${c(process.pid + '  -')} ${timestamp as string}     ` +
               `${c(level.toUpperCase())} \x1b[33m[${context as string}] ${message as string} \x1b[33m${ms as string}\x1b[39m` +
               `${trace && (trace as TraceWithStack).stack ? `\n${(trace as TraceWithStack).stack}` : ''}`
             );
