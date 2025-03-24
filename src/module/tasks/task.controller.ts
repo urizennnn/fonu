@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
@@ -26,15 +27,18 @@ export class TaskController {
   }
 
   @NeedsAuth()
-  @Get('list/:filter')
-  async list(@Req() req: Request, @Param() filter: TaskStatus) {
-    const user = req.user.id;
-    return this.taskService.list(user, filter);
+  @Get('list')
+  async list(@Req() req: Request, @Query('filter') filter: string) {
+    const userId = req.user.id;
+    return this.taskService.list(
+      userId,
+      filter ? (filter as TaskStatus) : null,
+    );
   }
 
   @NeedsAuth()
   @Delete('delete/:id')
-  async delete(@Param() id: string, @Req() req: Request) {
+  async delete(@Param('id') id: string, @Req() req: Request) {
     const user = req.user.id;
     return this.taskService.delete(id, user);
   }
@@ -42,7 +46,7 @@ export class TaskController {
   @NeedsAuth()
   @Patch(':id')
   async update(
-    @Param() id: string,
+    @Param('id') id: string,
     @Body() data: { description: string; status: TaskStatus },
     @Req() req: Request,
   ) {

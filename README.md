@@ -116,10 +116,10 @@ All endpoints are prefixed with `/api`.
 
   **Response:** Returns the created task object.
 
-- **GET /api/tasks/list/:filter**
+- **GET /api/tasks/list/?filter={argument}**
 
   **URL Parameter:**  
-  `filter` can be `"active"`, `"completed"`, or omitted (or set to `null`) to return all tasks.
+  `filter` can be `"active"`, `"completed"`, or omitted  to return all tasks.
 
   **Response:** Returns an array of tasks (filtered if a status is provided).
 
